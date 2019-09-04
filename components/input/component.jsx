@@ -32,6 +32,8 @@ export const Input = forwardClassRef(
 			size: PropTypes.number,
 			/** Inline input variation */
 			inline: PropTypes.bool,
+			/** Textarea input variation */
+			textarea: PropTypes.bool,
 			...common.propTypes,
 			...typography.propTypes,
 			...systemPropTypes.layout,
@@ -72,12 +74,14 @@ export const Input = forwardClassRef(
 				inline,
 				disabled,
 				onEnter,
+				textarea,
 				forwardedRef, // eslint-disable-line react/prop-types
 				...inputProps
 			} = this.props;
 
 			return (
 				<StyledInput
+					as={textarea && 'textarea'}
 					type={type || 'text'}
 					autoFocus={autoFocus}
 					readOnly={readOnly}

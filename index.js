@@ -28,7 +28,15 @@ export { Radio } from './components/radio';
 export { SimpleModal } from './components/simple-modal';
 export { Slider } from './components/slider';
 export { SimpleToast } from './components/simple-toast';
-export { TabManager, Tab, TabList, TabPanel, TabPanels } from './components/tabs';
+export {
+	TabManager,
+	Tab,
+	SequencedTab,
+	TabList,
+	SequencedTabList,
+	TabPanel,
+	TabPanels,
+} from './components/tabs';
 export {
 	Dropdown,
 	DropdownToggle,

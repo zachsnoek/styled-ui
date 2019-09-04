@@ -33,7 +33,9 @@ import {
 	SimpleToast,
 	TabManager,
 	Tab,
+	SequencedTab,
 	TabList,
+	SequencedTabList,
 	TabPanel,
 	TabPanels,
 	Dropdown,
@@ -781,11 +783,34 @@ const components = [
 				},
 			},
 			{
+				path: '/tabs/sequenced-tabs',
+				title: 'Sequenced Tabs',
+				content: pageLoader(() => import('./tabs/sequenced-tabs.md')),
+				imports: {
+					TabManager,
+					SequencedTab,
+					SequencedTabList,
+					TabPanels,
+					TabPanel,
+					TabDemo: styled.div`
+						padding: 8px;
+						background-color: white;
+
+						&& > * {
+							margin: 16px;
+						}
+					`,
+					Button,
+					createPortal: component => ReactDOM.createPortal(component, document.body),
+				},
+			},
+			{
 				path: '/tabs/documentation',
 				title: 'Tabs Documentation',
 				content: pageLoader(() => import('./tabs/documentation.md')),
 				imports: {
 					Tab,
+					SequencedTab,
 					TabManager,
 					DocgenTable,
 				},

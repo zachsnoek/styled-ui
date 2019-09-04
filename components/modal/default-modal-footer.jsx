@@ -20,6 +20,7 @@ export const DefaultModalFooter = props => (
 					tabIndex={props.commitButton.tabindex}
 					onClick={props.commitButton.onClick}
 					width={props.useFullWidthButtons ? '100%' : null}
+					disabled={props.commitButton.disabled}
 				>
 					{props.commitButton.text}
 				</Button>
@@ -36,6 +37,7 @@ export const DefaultModalFooter = props => (
 						tabIndex={props.cancelButton.tabindex}
 						onClick={props.cancelButton.onClick}
 						width={props.useFullWidthButtons ? '100%' : null}
+						disabled={props.cancelButton.disabled}
 					>
 						{props.cancelButton.text}
 					</Button>
@@ -56,6 +58,7 @@ export const DefaultModalFooter = props => (
 						activeColor="red5"
 						disabledColor="red1"
 						width={props.useFullWidthButtons ? '100%' : null}
+						disabled={props.deleteButton.disabled}
 					>
 						{props.deleteButton.text}
 					</Button>
@@ -70,15 +73,18 @@ DefaultModalFooter.propTypes = {
 		onClick: PropTypes.func.isRequired,
 		text: PropTypes.string.isRequired,
 		tabindex: PropTypes.string,
+		disabled: PropTypes.bool,
 	}),
 	cancelButton: PropTypes.shape({
 		onClick: PropTypes.func.isRequired,
 		text: PropTypes.string.isRequired,
 		tabindex: PropTypes.string,
+		disabled: PropTypes.bool,
 	}),
 	deleteButton: PropTypes.shape({
 		onClick: PropTypes.func.isRequired,
 		text: PropTypes.string.isRequired,
+		disabled: PropTypes.bool,
 	}),
 	useFullWidthButtons: PropTypes.bool,
 };

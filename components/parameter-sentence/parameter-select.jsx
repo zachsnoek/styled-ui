@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { theme } from '../../theme';
-import { Box } from '../Box';
 import { useId } from '../shared-hooks';
 import { VisuallyHiddenLabel } from '../hidden-label';
 import { Listbox, ListboxToggle, ListboxMenu, ListItem } from '../listbox';
@@ -11,10 +9,11 @@ export function ParameterSelect({
 	options,
 	selectedId,
 	onItemSelect,
+	width,
 	accessibilityLabel,
 	useNativeSelect,
-	padding,
-	...props
+	styleOverrides,
+	theme,
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const id = useId();
@@ -32,7 +31,7 @@ export function ParameterSelect({
 	);
 
 	return (
-		<Box display="inline-block" position="relative">
+		<Styled.Container>
 			<VisuallyHiddenLabel id={labelId}>{accessibilityLabel}</VisuallyHiddenLabel>
 			{!useNativeSelect ? (
 				<Listbox
@@ -40,6 +39,7 @@ export function ParameterSelect({
 					onToggleMenu={handleToggleMenu}
 					onItemSelect={onItemSelect}
 					selectedId={selectedId}
+					styleOverrides={{ width }}
 					labelledBy={labelId}
 				>
 					<ListboxToggle>
@@ -51,31 +51,13 @@ export function ParameterSelect({
 								type="button"
 								{...ariaProps}
 							>
-								<Styled.ButtonContent
-									whiteSpace="nowrap"
-									minHeight="fit-content"
-									textStyle="h.16"
-									borderBottom="dashed 2px"
-									borderColor="blue4"
-									color={isOpen ? '#1d6ca1' : 'gray66'}
-									padding={padding}
-									hoverColor="blue4"
-									activeColor="#1d6ca1"
-									focusOutline="none"
-									focusBoxShadow="0 0 0 0.2rem rgba(30, 145, 214, 0.5)"
-									{...props}
-								>
+								<Styled.ButtonContent isOpen={isOpen} theme={theme} styleOverrides={styleOverrides}>
 									{options[selectedId]}
 								</Styled.ButtonContent>
 							</Styled.Button>
 						)}
 					</ListboxToggle>
-					<ListboxMenu
-						padding={padding}
-						paddingY={padding !== undefined && padding !== null ? padding : 2}
-						width="auto"
-						{...props}
-					>
+					<ListboxMenu styleOverrides={{ zIndex: 10, padding: '4px 0', width }}>
 						{options &&
 							Object.entries(options).map(([value, name]) => (
 								<ListItem key={value} id={value}>
@@ -88,22 +70,9 @@ export function ParameterSelect({
 				<Styled.Select
 					value={selectedId}
 					onChange={handleNativeSelect}
+					theme={theme}
+					styleOverrides={styleOverrides}
 					aria-labelledby={labelId}
-					whiteSpace="nowrap"
-					minHeight="fit-content"
-					textStyle="h.16"
-					color={isOpen ? '#1d6ca1' : 'gray66'}
-					padding={padding}
-					border="none"
-					borderBottom="dashed 2px"
-					borderColor="blue4"
-					backgroundColor="transparent"
-					transition="box-shadow 0.25s ease 0s"
-					hoverColor="blue4"
-					activeColor="#1d6ca1"
-					focusOutline="none"
-					focusBoxShadow="0 0 0 0.2rem rgba(30, 145, 214, 0.5)"
-					{...props}
 				>
 					{options &&
 						Object.entries(options).map(([value, name]) => (
@@ -113,7 +82,7 @@ export function ParameterSelect({
 						))}
 				</Styled.Select>
 			)}
-		</Box>
+		</Styled.Container>
 	);
 }
 
@@ -126,8 +95,18 @@ ParameterSelect.propTypes = {
 	accessibilityLabel: PropTypes.string,
 	/** Use the native select controls (mobile only) */
 	useNativeSelect: PropTypes.bool,
+	theme: PropTypes.shape({
+		hoverColor: PropTypes.string,
+		activeColor: PropTypes.string,
+		underlineColor: PropTypes.string,
+	}),
+	styleOverrides: PropTypes.shape({
+		fontSize: PropTypes.string,
+	}),
 };
 
 ParameterSelect.defaultProps = {
-	theme: theme,
+	width: '180px',
+	styleOverrides: {},
+	theme: {},
 };

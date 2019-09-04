@@ -23,6 +23,8 @@ export const transitionTime = 250; // milliseconds
 export const ToastContainer = styled(Box)`
 	${typography}
 
+	pointer-events: none;
+
 	> svg {
 		height: 1em;
 		width: 1em;
@@ -36,15 +38,18 @@ export const ToastContainer = styled(Box)`
 				return css`
 					transition: opacity ${transitionTime}ms linear;
 					opacity: 1;
+					pointer-events: all;
 				`;
 			case TransitionStatuses.EXITING:
 				return css`
 					transition: opacity ${transitionTime}ms linear;
 					opacity: 0;
+					pointer-events: all;
 				`;
 			case TransitionStatuses.ENTERED:
 				return css`
 					opacity: 1;
+					pointer-events: all;
 				`;
 			default:
 				return '';
@@ -59,15 +64,18 @@ export const ToastContainer = styled(Box)`
 				case TransitionStatuses.ENTERING:
 					return css`
 						animation: ${slideIn(props)} ${transitionTime}ms linear;
+						pointer-events: all;
 					`;
 				case TransitionStatuses.EXITING:
 					return css`
 						transition: opacity ${transitionTime}ms linear;
 						opacity: 0;
+						pointer-events: all;
 					`;
 				case TransitionStatuses.ENTERED:
 					return css`
 						opacity: 1;
+						pointer-events: all;
 					`;
 				default:
 					return '';

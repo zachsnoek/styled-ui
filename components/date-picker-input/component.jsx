@@ -95,6 +95,10 @@ export class DatePickerInput extends PureComponent {
 	handleChange = ({ target }) => this.handleTextChange(target.value);
 
 	handleChangeSelectedDate = selectedDate => {
+		if (this.props.validate && !this.props.validate(selectedDate)) {
+			return;
+		}
+
 		this.setState({ selectedDate, text: null });
 		this.props.onChange(selectedDate);
 	};
@@ -106,6 +110,11 @@ export class DatePickerInput extends PureComponent {
 		});
 
 		const selectedDate = this.props.parseUserDateString(text);
+
+		if (this.props.validate && !this.props.validate(selectedDate)) {
+			return;
+		}
+
 		this.setState({ selectedDate });
 		this.props.onChange(selectedDate);
 	};

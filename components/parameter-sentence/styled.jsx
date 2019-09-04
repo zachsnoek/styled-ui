@@ -1,11 +1,35 @@
-import styled from 'styled-components';
-import { system, layout, textStyle, border } from 'styled-system';
-import { common, typography } from '../../theme/system';
+import styled, { css } from 'styled-components';
+import { colors, thickness } from '../shared-styles';
 import { resetStyles } from '../utils';
-import { Box } from '../Box';
-import { Text } from '../Text';
 
-const inputOffset = '-6px';
+const selectStyling = css`
+	white-space: nowrap;
+	min-height: fit-content;
+	font-size: ${({ styleOverrides }) => styleOverrides.fontSize || '16px'};
+	width: ${({ styleOverrides }) => styleOverrides.width};
+	border-bottom: dashed ${thickness.two} ${({ theme }) => theme.underlineColor || colors.blueBase};
+	font-weight: bold;
+	color: ${colors.gray66};
+	${props => `color: ${props.isOpen ? colors.blueActive : colors.gray66}`};
+	font-family: inherit;
+	border-radius: 0;
+	line-height: 1;
+	padding-bottom: 2px;
+
+	&:hover {
+		&:not(:focus) {
+			color: ${({ theme }) => theme.hoverColor || colors.blueBase};
+		}
+	}
+
+	&:active {
+		color: ${({ theme }) => theme.activeColor || colors.blueActive};
+	}
+
+	&:focus {
+		outline: none;
+	}
+`;
 
 export const Button = styled.button`
 	${resetStyles};
@@ -28,36 +52,14 @@ export const Button = styled.button`
 	}
 `;
 
-export const ButtonContent = styled(Text).attrs({ tabIndex: '-1' })`
-	&:hover {
-		&:not(:focus) {
-			${system({ hoverColor: { property: 'color', scale: 'colors' } })};
-		}
-	}
-
-	&:active {
-		${system({ activeColor: { property: 'color', scale: 'colors' } })};
-	}
-
-	&:focus {
-		${system({ focusOutline: { property: 'outline' } })};
-	}
+export const ButtonContent = styled.div.attrs({ tabIndex: '-1' })`
+	${selectStyling};
 `;
 
-export const InputContainer = styled(Box)`
-	z-index: 0;
-	position: absolute;
-	bottom: ${inputOffset};
-
-	&& > input::-webkit-outer-spin-button,
-	input::-webkit-inner-spin-button {
-		appearance: none;
-		margin: 0;
-	}
-
-	&& > input[type='number'] {
-		appearance: textfield; /* Firefox */
-	}
+export const Container = styled.div`
+	display: inline-block;
+	position: relative;
+	width: ${props => props.width};
 `;
 
 export const ParameterSentence = styled.form.attrs({
@@ -74,31 +76,85 @@ export const Fieldset = styled.fieldset`
 `;
 
 export const Select = styled.select`
-	${common};
-	${typography};
-	${layout};
-	${textStyle};
-	${border};
-
 	appearance: none;
 	user-select: none;
 	cursor: pointer;
+	border: none;
+	background-color: transparent;
 	text-align-last: center;
 
-	&:hover {
-		&:not(:focus) {
-			${system({ hoverColor: { property: 'color', scale: 'colors' } })};
-		}
-	}
+	${selectStyling};
 
-	&:active {
-		${system({ activeColor: { property: 'color', scale: 'colors' } })};
-	}
+	transition: box-shadow 0.25s ease 0s;
 
 	&:focus {
 		&:not(:active) {
-			${system({ focusBoxShadow: { property: 'box-shadow', scale: 'shadows' } })};
+			box-shadow: 0 0 0 0.2rem rgba(30, 145, 214, 0.5);
 		}
-		${system({ focusOutline: { property: 'outline' } })};
+		outline: none;
+	}
+`;
+
+export const InputContainer = styled.div`
+	display: inline-block;
+	position: relative;
+	width: ${props => props.width};
+
+	${selectStyling};
+
+	border-bottom: ${({ isFocused }) => (isFocused ? 'solid' : 'dashed')} ${thickness.two}
+		${({ theme }) => theme.underlineColor || colors.blueBase};
+
+	height: ${({ styleOverrides }) => styleOverrides.fontSize || '16px'};
+
+	&& > input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		appearance: none;
+		margin: 0;
+	}
+
+	&& > input[type='number'] {
+		appearance: textfield; /* Firefox */
+	}
+`;
+
+export const Input = styled.input`
+	&& {
+		${resetStyles};
+
+		padding: 0;
+		padding-bottom: 0;
+
+		width: ${props => props.styleOverrides.width};
+		height: ${({ styleOverrides }) =>
+			styleOverrides.fontSize ? `calc(2px + ${styleOverrides.fontSize})` : '18px'};
+		line-height: 1;
+		font-size: ${({ styleOverrides }) => styleOverrides.fontSize || '16px'};
+		font-weight: 600;
+		border-radius: 0;
+
+		background-color: transparent;
+		border: none;
+		box-shadow: none;
+		outline: none;
+
+		&:disabled {
+			opacity: 0.5;
+		}
+
+		&:read-only {
+			background: ${colors.gray8};
+		}
+
+		&:focus,
+		&:focus-within,
+		&:focus-visible {
+			padding: 0;
+			padding-bottom: 0;
+			background-color: transparent;
+			border: none;
+			box-shadow: none;
+			outline: none;
+		}
 	}
 `;

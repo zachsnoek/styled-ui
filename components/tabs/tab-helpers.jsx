@@ -1,38 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { system } from 'styled-system';
 import { useId } from '../shared-hooks';
-import { Box } from '../Box';
-import { useTabContext, useKeyboardNav } from './tab-utils';
+import { useTabContext, useKeyboardNav, useSequencedKeyboardNav } from './tab-utils';
+import * as Styled from './styled';
 
-export function TabList({ children, ...props }) {
-	const { onSelectTab, selectedTabIndex, panelIdsMap } = useTabContext();
+export function TabList({ children }) {
+	const { onSelectTab, selectedTabIndex, theme, panelIdsMap } = useTabContext();
 
 	const handleKeyboardNav = useKeyboardNav(selectedTabIndex, onSelectTab, children);
-
 	return (
-		<TabListBox
-			onKeyDown={handleKeyboardNav}
-			role="tablist"
-			display="flex"
-			marginRight={0}
-			notLastSiblingMarginRight={3}
-			borderBottom={1}
-			borderColor="gray14"
-			{...props}
-		>
+		<Styled.TabList onKeyDown={handleKeyboardNav}>
 			{React.Children.map(children, (child, index) =>
 				React.isValidElement(child)
 					? React.cloneElement(child, {
 							selected: selectedTabIndex === index,
 							onSelectTab,
 							index,
+							theme,
 							panelId: panelIdsMap[index],
 					  })
 					: null,
 			)}
-		</TabListBox>
+		</Styled.TabList>
 	);
 }
 
@@ -40,16 +29,54 @@ TabList.propTypes = {
 	children: PropTypes.node.isRequired,
 };
 
-const TabListBox = styled(Box)`
-	& > *:not(:last-child) {
-		${system({ notLastSiblingMarginRight: { property: 'margin-right', scale: 'space' } })};
-	}
-`;
+export function SequencedTabList({ children }) {
+	const { onSelectTab, selectedTabIndex, theme, panelIdsMap } = useTabContext();
 
-export function TabPanels({ children, ...props }) {
+	const [touchedTabs, setTouchedTabs] = useState(new Set());
+
+	useEffect(() => {
+		setTouchedTabs(touchedTabs => new Set(touchedTabs).add(selectedTabIndex));
+	}, [selectedTabIndex]);
+
+	const handleKeyboardNav = useSequencedKeyboardNav(selectedTabIndex, onSelectTab, children);
+	return (
+		<Styled.SequencedTabList onKeyDown={handleKeyboardNav}>
+			{React.Children.map(children, (child, index) =>
+				React.isValidElement(child)
+					? React.cloneElement(child, {
+							selected: selectedTabIndex === index,
+							disabled:
+								!touchedTabs.has(index) &&
+								(child.props.disabled ||
+									(selectedTabIndex < index - 1 &&
+										!children
+											.slice(selectedTabIndex + 1, index)
+											.every(value => value.props.disabled))),
+							completed:
+								selectedTabIndex !== index &&
+								(touchedTabs.has(index) ||
+									(child.props.disabled
+										? false
+										: child.props.completed || selectedTabIndex > index)),
+							onSelectTab,
+							index,
+							theme,
+							panelId: panelIdsMap[index],
+					  })
+					: null,
+			)}
+		</Styled.SequencedTabList>
+	);
+}
+
+SequencedTabList.propTypes = {
+	children: PropTypes.node.isRequired,
+};
+
+export function TabPanels({ children }) {
 	const { selectedTabIndex, registerPanelId, unRegisterPanelId } = useTabContext();
 	return (
-		<Box {...props}>
+		<div>
 			{React.Children.map(children, (child, index) =>
 				React.isValidElement(child)
 					? React.cloneElement(child, {
@@ -60,7 +87,7 @@ export function TabPanels({ children, ...props }) {
 					  })
 					: null,
 			)}
-		</Box>
+		</div>
 	);
 }
 
@@ -71,7 +98,7 @@ TabPanels.propTypes = {
 export function TabPanel(props) {
 	// PropType linting is diabled so out hidden props can be destuctured along with own consumer props
 	// eslint-disable-next-line react/prop-types
-	const { children, selected, registerPanelId, unRegisterPanelId, index, ...otherProps } = props;
+	const { children, selected, registerPanelId, unRegisterPanelId, index } = props;
 	const id = useId();
 
 	useEffect(
@@ -88,25 +115,12 @@ export function TabPanel(props) {
 	);
 
 	return (
-		<TabPanelBox
-			role="tabpanel"
-			id={`panel:${id}`}
-			aria-expanded={selected}
-			display={!selected && 'none'}
-			position="relative"
-			padding={3}
-			focusOutline="none"
-			{...otherProps}
-		>
+		<Styled.TabPanel panelId={id} selected={selected}>
 			{children}
-		</TabPanelBox>
+		</Styled.TabPanel>
 	);
 }
 
 TabPanel.propTypes = {
 	children: PropTypes.node.isRequired,
 };
-
-const TabPanelBox = styled(Box)`
-	${system({ focusOutline: { property: 'outline' } })};
-`;

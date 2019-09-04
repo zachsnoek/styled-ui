@@ -1,5 +1,47 @@
 # Changelog
 
+### 5.12.5
+
+- Fix width prop not being passed through in `ParameterSelect`
+- Fix `SimpleToast` covering elements when not being shown
+- Fix `ParameterInputBox` cutting off dangling letters in safari
+
+### 5.12.4
+
+- Add more specificity to `ParameterInputBox` styles to beat global styles
+
+### 5.12.3
+
+- Simplify `ParameterInputBox` to only use inputs
+
+### 5.12.2
+
+- Fix `ParameterInputBox` styling on safari mobile
+- Add ref to `ParameterInputBox`
+
+### 5.12.1
+
+- Removed padding from checkboxes and radios that was previously added to increase tap target size on mobile.
+
+### 5.12.0
+
+- `GroupPicker` now accepts a z-index to use for its modal.
+
+### 5.11.0
+
+- `GroupPicker` now allows non-admin users to select groups.
+- Update chevron icons.
+
+### 5.10.0
+
+- Add `SequencedTab` and `SequencedTabList` components
+- Add `textarea` variation to `Input`
+- Add disabled props to `Checkbox` and `Radio`
+- Update `Modal` `Popover` `Helpbox` and `Button` to spec
+- Hide tooltips on mobile
+- Fix keyboard navigation on `Dropdown` and `Listbox` components
+- Add overflow style override to `Popover`
+
 ### 5.9.1
 
 - Update dependencies.

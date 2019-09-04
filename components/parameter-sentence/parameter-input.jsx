@@ -1,10 +1,8 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '../Box';
-import { Input } from '../input';
 import * as Styled from './styled';
 
-export function ParameterInputBox(props) {
+export const ParameterInputBox = React.forwardRef((props, ref) => {
 	const {
 		defaultValue,
 		value,
@@ -12,64 +10,56 @@ export function ParameterInputBox(props) {
 		formatValue,
 		width,
 		accessibilityLabel,
+		styleOverrides,
+		theme,
+		onFocus,
+		onBlur,
 		...inputProps
 	} = props;
 	const [isFocused, setIsFocused] = useState(false);
-	const inputRef = useRef();
-
-	/**
-	 * Due to a really strange firefox bug inputs with type=number will unfocus the input as soon as it is focused using the autofocus option.
-	 * Possibly related to https://github.com/angular/angular.js/issues/8365 though the described fixes did not work.
-	 */
-	useEffect(() => {
-		if (isFocused && inputRef.current) {
-			inputRef.current.focus();
-		}
-	}, [isFocused]);
 
 	const toggleFocus = useCallback(() => {
 		setIsFocused(state => !state);
 	}, []);
 
-	const displayValue = formatValue(value || defaultValue);
+	const handleFocus = useCallback(() => {
+		if (onFocus) {
+			onFocus();
+		}
+		toggleFocus();
+	}, [onFocus, toggleFocus]);
+
+	const handleBlur = useCallback(() => {
+		if (onBlur) {
+			onBlur();
+		}
+		toggleFocus();
+	}, [onBlur, toggleFocus]);
+
+	const displayValue = formatValue ? formatValue(value || defaultValue) : value || defaultValue;
 
 	return (
-		<Box display="inline-block" position="relative" {...(isFocused ? { width } : {})}>
-			{!isFocused ? (
-				<Styled.Button onClick={toggleFocus} onFocus={toggleFocus}>
-					<Styled.ButtonContent
-						whiteSpace="nowrap"
-						minHeight="fit-content"
-						width={width}
-						textStyle="h.16"
-						borderBottom="dashed 2px"
-						borderColor="blue4"
-						color="gray66"
-						{...inputProps}
-					>
-						{displayValue}
-					</Styled.ButtonContent>
-				</Styled.Button>
-			) : (
-				<Styled.InputContainer>
-					<Input
-						ref={inputRef}
-						variant="inline"
-						value={value}
-						onChange={onChange}
-						placeholder={defaultValue}
-						onEnter={toggleFocus}
-						onBlur={toggleFocus}
-						textStyle="h.16"
-						width={width}
-						aria-label={accessibilityLabel}
-						{...inputProps}
-					/>
-				</Styled.InputContainer>
-			)}
-		</Box>
+		<Styled.InputContainer
+			width={width}
+			isFocused={isFocused}
+			theme={theme}
+			styleOverrides={{ width, ...styleOverrides }}
+		>
+			<Styled.Input
+				ref={ref}
+				onChange={onChange}
+				placeholder={defaultValue}
+				onFocus={handleFocus}
+				onBlur={handleBlur}
+				value={!isFocused ? displayValue : value}
+				theme={theme}
+				aria-label={accessibilityLabel}
+				styleOverrides={{ width, ...styleOverrides }}
+				{...inputProps}
+			/>
+		</Styled.InputContainer>
 	);
-}
+});
 
 ParameterInputBox.propTypes = {
 	defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -78,4 +68,17 @@ ParameterInputBox.propTypes = {
 	formatValue: PropTypes.func,
 	width: PropTypes.string,
 	accessibilityLabel: PropTypes.string.isRequired,
+	theme: PropTypes.shape({
+		hoverColor: PropTypes.string,
+		activeColor: PropTypes.string,
+		underlineColor: PropTypes.string,
+	}),
+	styleOverrides: PropTypes.shape({
+		fontSize: PropTypes.string,
+	}),
+};
+
+ParameterInputBox.defaultProps = {
+	theme: {},
+	styleOverrides: {},
 };

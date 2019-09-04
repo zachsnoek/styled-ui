@@ -116,7 +116,8 @@ Button.propTypes = {
 	minorTransparent: PropTypes.bool,
 	/** Enables rendering a display: flex span, needed for rendering SVG icons */
 	icon: PropTypes.node,
-	/** This should only be used as a last resort if current available styling options will not do what you need */
+	/** Disables the button. */
+	disabled: PropTypes.bool,
 	className: PropTypes.string,
 	...common.propTypes,
 	...typography.propTypes,

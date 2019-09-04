@@ -1,14 +1,21 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { system } from 'styled-system';
-import { resetStyles } from '../utils';
-import { Text } from '../Text';
+import { SmallCheck } from '../icons';
+import * as Styled from './styled.jsx';
 
 export function Tab(props) {
-	// PropType linting is diabled so out hidden props can be destuctured along with own consumer props
+	// PropType linting is diabled so our hidden props can be destuctured along with own consumer props
 	/* eslint-disable react/prop-types */
-	const { children, disabled, index, selected, onSelectTab, panelId, ...otherProps } = props;
+	const {
+		children,
+		disabled,
+		styleOverrides,
+		index,
+		selected,
+		onSelectTab,
+		theme,
+		panelId,
+	} = props;
 	const tabRef = useRef();
 
 	useEffect(() => {
@@ -22,36 +29,22 @@ export function Tab(props) {
 	}, [onSelectTab, index]);
 
 	return (
-		<TabButton
+		<Styled.Tab
 			disabled={disabled}
 			panelId={panelId || ''}
 			selected={selected}
 			onClick={handleSelectTab}
 		>
-			<TabContent
+			<Styled.TabContent
 				ref={tabRef}
+				disabled={disabled}
+				theme={theme}
+				styleOverrides={styleOverrides}
 				selected={selected}
-				display="inline-block"
-				minHeight="fit-content"
-				paddingY={3}
-				paddingX={5}
-				borderRight={selected ? 1 : ''}
-				borderLeft={selected ? 1 : ''}
-				borderColor={selected ? 'gray14' : ''}
-				focusOutline="none"
-				color={disabled ? 'gray52' : ''}
-				activeBackgroundColor="white"
-				inactiveBackgroundColor="gray4"
-				tabHighlightColor="blue4"
-				afterBackgroundColor="white"
-				textStyle="h.16"
-				fontWeight={selected ? 'semibold' : 'regular'}
-				css={{ cursor: 'pointer' }}
-				{...otherProps}
 			>
 				{typeof children === 'function' ? children({ selected, disabled }) : children}
-			</TabContent>
-		</TabButton>
+			</Styled.TabContent>
+		</Styled.Tab>
 	);
 }
 
@@ -59,71 +52,70 @@ Tab.propTypes = {
 	/** The tab's label */
 	children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
 	disabled: PropTypes.bool,
+	styleOverrides: PropTypes.shape({
+		fontSize: PropTypes.string,
+		width: PropTypes.string,
+		padding: PropTypes.string,
+	}),
 };
 
-const TabButton = styled.button.attrs({
-	role: 'tab',
-	'aria-selected': ({ selected }) => selected,
-	'aria-controls': ({ panelId }) => `panel:${panelId}`,
-	'aria-disabled': ({ disabled }) => disabled,
-	tabIndex: ({ selected }) => (selected ? '0' : '-1'),
-})`
-	${resetStyles};
+Tab.defaultProps = {
+	styleOverrides: {},
+};
 
-	box-shadow: none;
-	outline: none;
-	background: white;
-	border: none;
-	display: inline-block;
-	padding: 0;
-	transition: all 0.25s ease 0s;
-	border: 0;
-	border-radius: 3px 3px 0 0;
+export function SequencedTab(props) {
+	// PropType linting is diabled so our hidden props can be destuctured along with own consumer props
+	/* eslint-disable react/prop-types */
+	const {
+		children,
+		disabled,
+		completed,
+		styleOverrides,
+		index,
+		selected,
+		onSelectTab,
+		theme,
+		panelId,
+	} = props;
+	const tabRef = useRef();
 
-	position: relative;
+	useEffect(() => {
+		if (selected && tabRef.current) {
+			tabRef.current.focus();
+		}
+	}, [selected]);
 
-	&:focus {
-		box-shadow: 0 0 0 0.2rem rgba(30, 145, 214, 0.5);
-		outline: none;
-	}
-`;
+	const handleSelectTab = useCallback(() => {
+		onSelectTab(index);
+	}, [onSelectTab, index]);
 
-const TabContent = styled(Text)`
-	&:focus {
-		${system({ focusOutline: { property: 'outline' } })};
-	}
+	return (
+		<Styled.SequencedTab
+			disabled={disabled}
+			panelId={panelId || ''}
+			selected={selected}
+			onClick={handleSelectTab}
+		>
+			<Styled.Circle selected={selected} completed={completed} disabled={disabled}>
+				{completed ? <SmallCheck /> : index + 1}
+			</Styled.Circle>
+			<Styled.SequencedTabContent
+				ref={tabRef}
+				disabled={disabled}
+				theme={theme}
+				styleOverrides={styleOverrides}
+				selected={selected}
+			>
+				{typeof children === 'function' ? children({ selected, disabled }) : children}
+			</Styled.SequencedTabContent>
+		</Styled.SequencedTab>
+	);
+}
 
-	${system({ inactiveBackgroundColor: { property: 'background-color', scale: 'colors' } })};
-
-	${({ selected }) => selected && selectedTab};
-`;
-
-const selectedTab = css`
-	${system({ activeBackgroundColor: { property: 'background-color', scale: 'colors' } })};
-
-	&::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 3px;
-
-		border-right: 1px solid;
-		border-left: 1px solid;
-		${system({
-			tabHighlightColor: { properties: ['background-color', 'border-color'], scale: 'colors' },
-		})};
-		border-radius: 3px 3px 0 0;
-	}
-
-	&::after {
-		content: '';
-		position: absolute;
-		top: 100%;
-		left: 1px;
-		width: calc(100% - 2px);
-		height: 1px;
-		${system({ afterBackgroundColor: { property: 'background-color', scale: 'colors' } })};
-	}
-`;
+SequencedTab.propTypes = {
+	/** The tab's label */
+	children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
+	disabled: PropTypes.bool,
+	/** The user should always be shown this tab even though it's been externally completed. */
+	completed: PropTypes.bool,
+};

@@ -166,7 +166,7 @@ export const LargeTopGradientWrapper = styled.div`
 `;
 
 export const LargeTitle = styled.div`
-	font-size: 32px;
+	font-size: 28px;
 	margin: 5px 0 0 0;
 	font-weight: 800;
 	color: #575251;
@@ -291,6 +291,10 @@ export const SearchResultMessage = styled.div`
 	font-size: 12px;
 `;
 
+export const UnderlinedSearchResultMessage = styled(SearchResultMessage)`
+	border-bottom: 1px dashed #a8a8a8;
+`;
+
 export const SearchResultHightlightText = styled.span`
 	font-weight: 600;
 	font-size: 12px;
@@ -340,4 +344,14 @@ export const SecondaryModalButtonContainer = styled.div`
 	flex-direction: row-reverse;
 	width: 100%;
 	justify-content: flex-start;
+`;
+
+export const TooltipContentBlock = styled.p`
+	text-align: left;
+	margin: 0 16px 16px 16px;
+	font-size: 14px;
+
+	&:first-of-type {
+		margin-top: 16px;
+	}
 `;

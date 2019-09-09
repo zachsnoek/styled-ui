@@ -2,14 +2,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Transition from 'react-transition-group/Transition';
-import {
-	forwardClassRef,
-	omit,
-	pick,
-	TransitionTimeouts,
-	TransitionPropTypeKeys,
-	TransitionStatuses,
-} from '../utils';
+import { forwardClassRef, TransitionTimeouts, TransitionStatuses } from '../utils';
 import { Box } from '../Box';
 
 const propTypes = {
@@ -77,27 +70,37 @@ export const Collapse = forwardClassRef(
 		}
 
 		render() {
-			const { isOpen, children, forwardedRef, ...otherProps } = this.props;
+			const {
+				isOpen,
+				children,
+				forwardedRef,
+				in: transitionIn,
+				mountOnEnter,
+				unmountOnExit,
+				appear,
+				enter,
+				exit,
+				timeout,
+				onEnter,
+				onEntering,
+				onEntered,
+				onExit,
+				onExiting,
+				onExited,
+				...otherProps
+			} = this.props;
 
 			const { height } = this.state;
 
-			// In NODE_ENV=production the Transition.propTypes are wrapped which results in an
-			// empty object "{}". This is the result of the `react-transition-group` babel
-			// configuration settings. Therefore, to ensure that production builds work without
-			// error, we can either explicitly define keys or use the Transition.defaultProps.
-			// Using the Transition.defaultProps excludes any required props. Thus, the best
-			// solution is to explicitly define required props in our utilities and reference these.
-			// This also gives us more flexibility in the future to remove the prop-types
-			// dependency in distribution builds (Similar to how `react-transition-group` does).
-			// Note: Without omitting the `react-transition-group` props, the resulting child
-			// Tag component would inherit the Transition properties as attributes for the HTML
-			// element which results in errors/warnings for non-valid attributes.
-			const transitionProps = pick(otherProps, TransitionPropTypeKeys);
-			const childProps = omit(otherProps, TransitionPropTypeKeys);
-
 			return (
 				<Transition
-					{...transitionProps}
+					mountOnEnter={mountOnEnter}
+					unmountOnExit={unmountOnExit}
+					appear={appear}
+					enter={enter}
+					exit={exit}
+					timeout={timeout}
+					onEnter={onEnter}
 					in={isOpen}
 					onEntering={this.onEntering}
 					onEntered={this.onEntered}
@@ -109,12 +112,12 @@ export const Collapse = forwardClassRef(
 						const style = height === null ? null : { height };
 						return (
 							<Box
-								{...childProps}
+								{...otherProps}
 								onClick={this.handleClick}
 								transitionStatus={status}
-								style={{ ...childProps.style, ...style }}
+								style={{ ...otherProps.style, ...style }}
 								ref={forwardedRef}
-								display={status === TransitionStatuses.EXITED && 'none'}
+								display={status === TransitionStatuses.EXITED ? 'none' : undefined}
 								position={
 									status === TransitionStatuses.ENTERING || status === TransitionStatuses.EXITING
 										? 'relative'
@@ -135,7 +138,6 @@ export const Collapse = forwardClassRef(
 										? 'overflow: hidden'
 										: ''}
 								`}
-								{...otherProps}
 							>
 								{children}
 							</Box>

@@ -51,6 +51,7 @@ export {
 	ParameterInputBox,
 	ParameterSentence,
 } from './components/parameter-sentence';
+export { SimpleGrid, GridColumn, PaginatedGrid, TreeGrid } from './components/grid';
 
 export { theme } from './theme';
 export { Box } from './components/Box';

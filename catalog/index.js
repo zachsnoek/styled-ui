@@ -51,11 +51,15 @@ import {
 	ParameterSelect,
 	ParameterInputBox,
 	ParameterSentence,
+	GridColumn,
+	PaginatedGrid,
+	SimpleGrid,
 	Box,
 	Stack,
 	Text,
 	Paragraph,
 	theme,
+	TreeGrid,
 } from '../index';
 import { GroupSelector, LargeGroupSelector } from '../components/group-selector';
 import { ShareDialog } from '../components/share-dialog';
@@ -65,8 +69,7 @@ import censusData from './grid/2010census.json';
 import { ProductDrawerWithResources } from './product-drawer';
 import { DocgenTable } from './docgen-table';
 import { PopulationChange } from './grid/population-change';
-import { BaseTable } from '../components/grid/base-table';
-import { TableHeading, PaginatedTable, SimpleTable } from '../components/grid';
+import { BaseGrid } from '../components/grid/base-grid';
 
 // SVG icons embedded in SASS stylesheets do not work properly with catalog,
 // so the stylesheets must be built by a separate webpack build.
@@ -76,6 +79,38 @@ const censusDataWithId = censusData.map((data, index) => ({
 	...data,
 	id: index,
 }));
+
+const censusDataFolders = censusData.reduce((list, row, index) => {
+	const subFolderName = row.population > 100000 ? 'Pop more than 100k' : 'Pop less than 100k';
+	const folder = list.find(x => x.value === row.areaDesc);
+
+	if (folder) {
+		const subFolder = folder.children.find(x => x.value === subFolderName);
+		if (subFolder) {
+			subFolder.children.push({ id: `${index}`, ...row });
+		} else {
+			folder.children.push({
+				id: `${row.areaDesc}:${subFolderName}`,
+				value: subFolderName,
+				children: [{ id: `${index}`, ...row }],
+			});
+		}
+	} else {
+		list.push({
+			id: `${row.areaDesc}`,
+			value: row.areaDesc,
+			children: [
+				{
+					id: `${row.areaDesc}:${subFolderName}`,
+					value: subFolderName,
+					children: [{ id: `${index}`, ...row }],
+				},
+			],
+		});
+	}
+
+	return list;
+}, []);
 
 const ButtonDemo = styled.div`
 	display: inline-grid;
@@ -293,11 +328,13 @@ const components = [
 				path: '/grid/variations',
 				content: pageLoader(() => import('./grid/variations.md')),
 				imports: {
-					TableHeading,
-					PaginatedTable,
-					SimpleTable,
+					GridColumn,
+					PaginatedGrid,
+					SimpleGrid,
+					TreeGrid,
 					Button,
 					censusData: censusDataWithId,
+					censusDataFolders,
 				},
 			},
 			{
@@ -305,19 +342,20 @@ const components = [
 				path: '/grid/simple-examples',
 				content: pageLoader(() => import('./grid/examples.md')),
 				imports: {
-					TableHeading,
-					SimpleTable,
+					GridColumn,
+					SimpleGrid,
 					Input,
 					PopulationChange,
 					Button,
 					censusData: censusDataWithId,
+					censusDataFolders,
 				},
 			},
 			{
 				title: 'Documentation',
 				path: '/grid/documentation',
 				content: pageLoader(() => import('./grid/documentation.md')),
-				imports: { DocgenTable, TableHeading, SimpleTable, BaseTable, PaginatedTable },
+				imports: { DocgenTable, GridColumn, SimpleGrid, BaseGrid, PaginatedGrid },
 			},
 		],
 	},
